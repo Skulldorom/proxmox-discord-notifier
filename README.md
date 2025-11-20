@@ -1,10 +1,11 @@
 # proxmox2discord
+
 Reliable Proxmox Backup and VM Log Notifications in Discord
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-
 ## Overview
+
 Discord enforces a 2000‑character limit per message, which can truncate lengthy Proxmox backup logs or VM events and obscure critical details. **Proxmox2Discord** solves this by:
 
 - Capturing full Proxmox output in raw log files.
@@ -22,43 +23,15 @@ Whether you run nightly backups or ad‑hoc snapshots, Proxmox2Discord ensures y
 - Docker‑Ready: Official Dockerfile for fast deployment.
 
 ## Prerequisites
-- Python 3.12+ or Docker
 
-## Installation
-
-### Docker (Recommended)
-Clone repository and build Docker image.
-```bash
-git clone https://github.com/jordantshaw/proxmox2discord.git
-cd proxmox2discord
-docker build -t proxmox2discord:latest .
-```
-
-### One‑Line Manual Install
-This will install the application into your users HOME directory.
-
-**Linux/macOS:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/jordantshaw/proxmox2discord/main/scripts/install.sh | bash
-```
-
-**Windows (PowerShell):**
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "iex (iwr https://raw.githubusercontent.com/jordantshaw/proxmox2discord/main/scripts/install.ps1 -UseBasicParsing)"
-```
-
-### Manual Install
-```bash
-git clone https://github.com/jordantshaw/proxmox2discord.git
-cd proxmox2discord
-pip install -r requirements.txt
-```
-
+- Docker
 
 ## Quickstart
 
 ### Using Docker
+
 Run with Docker.
+
 ```bash
 docker run -d \
   -p 6068:6068 \
@@ -69,6 +42,7 @@ docker run -d \
 ```
 
 Optionally you can use docker-compose as well.
+
 ```yaml
 services:
   proxmox2discord:
@@ -81,13 +55,15 @@ services:
       - TZ=UTC
       - DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
     ports:
-      - '6068:6068'
+      - "6068:6068"
 ```
+
 ```bash
 docker compose up -d
 ```
 
 ### Run Manually
+
 ```bash
 # Set the Discord webhook (optional if provided in request)
 export DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
@@ -95,15 +71,17 @@ proxmox2discord
 ```
 
 ### Verify
+
 Open [http://<YOUR_HOST>:6068/docs](http://<YOUR_HOST>:6068/docs) for the interactive API docs.
 
-
 ## Proxmox Integration
+
 Point your Proxmox cluster at the `/notify` endpoint so every alert is mirrored to Discord and archived.
 
 ### Configuration
 
 The Discord webhook URL can be configured in two ways:
+
 1. **Environment Variable** (Recommended): Set `DISCORD_WEBHOOK` in your Docker/environment
 2. **Request Payload**: Include `discord_webhook` in each request (overrides environment variable)
 
@@ -111,32 +89,32 @@ The Discord webhook URL can be configured in two ways:
 
 If you set the `DISCORD_WEBHOOK` environment variable, you can omit it from the request body:
 
-| UI Field            | Value / Example                                                                                                                                                                                                  |
-|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Endpoint Name**   | `proxmox2discord `                                                                                                                                                                                               |
-| **Method**          | `POST`                                                                                                                                                                                                           |
-| **URL**             | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                                                         |
-| **Headers**         | `Content-Type: application/json`                                                                                                                                                                                 |
-| **Body**            | <pre lang=json>{<br/>  "title" : "{{ title }}",<br/>  "message": "{{ escape message }}",<br/>  "severity": "{{ severity }}",<br/>  "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre>                       |
-| **Secrets**         | `user_id` → your Discord user ID (optional)                                                                                                                                                                      |
-| **Enable**          | ✓                                                                                                                                                                                                                |
+| UI Field          | Value / Example                                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Endpoint Name** | `proxmox2discord `                                                                                                                                                                   |
+| **Method**        | `POST`                                                                                                                                                                               |
+| **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                             |
+| **Headers**       | `Content-Type: application/json`                                                                                                                                                     |
+| **Body**          | <pre lang=json>{<br/> "title" : "{{ title }}",<br/> "message": "{{ escape message }}",<br/> "severity": "{{ severity }}",<br/> "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre> |
+| **Secrets**       | `user_id` → your Discord user ID (optional)                                                                                                                                          |
+| **Enable**        | ✓                                                                                                                                                                                    |
 
 ### Setup with Request Payload (Original Method)
 
 If you prefer to include the webhook in each request or need per-request webhooks:
 
-| UI Field            | Value / Example                                                                                                                                                                                                                                                                     |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Endpoint Name**   | `proxmox2discord `                                                                                                                                                                                                                                                                  |
-| **Method**          | `POST`                                                                                                                                                                                                                                                                              |
-| **URL**             | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                                                                                                                            |
-| **Headers**         | `Content-Type: application/json`                                                                                                                                                                                                                                                    |
-| **Body**            | <pre lang=json>{<br/>  "discord_webhook": "https://discord.com/api/webhooks/{{ secrets.id }}/{{ secrets.token }}",<br/>  "title" : "{{ title }}",<br/>  "message": "{{ escape message }}",<br/>  "severity": "{{ severity }}",<br/>  "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre> |
-| **Secrets**         | `id` → your Discord webhook **ID**<br>`token` → your Discord webhook **token** <br>`user_id` → your Discord user ID (optional)                                                                                                                                                       |
-| **Enable**          | ✓                                                                                                                                                                                                                                                                                   |
+| UI Field          | Value / Example                                                                                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Endpoint Name** | `proxmox2discord `                                                                                                                                                                                                                                                                    |
+| **Method**        | `POST`                                                                                                                                                                                                                                                                                |
+| **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                                                                                                                              |
+| **Headers**       | `Content-Type: application/json`                                                                                                                                                                                                                                                      |
+| **Body**          | <pre lang=json>{<br/> "discord_webhook": "https://discord.com/api/webhooks/{{ secrets.id }}/{{ secrets.token }}",<br/> "title" : "{{ title }}",<br/> "message": "{{ escape message }}",<br/> "severity": "{{ severity }}",<br/> "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre> |
+| **Secrets**       | `id` → your Discord webhook **ID**<br>`token` → your Discord webhook **token** <br>`user_id` → your Discord user ID (optional)                                                                                                                                                        |
+| **Enable**        | ✓                                                                                                                                                                                                                                                                                     |
 
 > **Note**: If both environment variable and request payload contain a webhook URL, the request payload takes precedence.
 
-
 ## License
+
 Released under the [MIT License](LICENSE).
