@@ -11,9 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set lowercase repo owner
-        run: echo "REPO_OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -30,7 +27,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:${{ github.sha }}
-            ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:latest
-          cache-from: type=registry,ref=ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:buildcache,mode=max
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
