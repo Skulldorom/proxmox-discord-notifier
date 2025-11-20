@@ -16,6 +16,15 @@ class Settings(BaseSettings):
         v.mkdir(parents=True, exist_ok=True)
         return v
 
+    @field_validator('base_url', mode='before')
+    @classmethod
+    def clean_base_url(cls, v):
+        """Strip quotes from base_url if present"""
+        if v is None or not isinstance(v, str):
+            return v
+        # Remove surrounding quotes if present
+        return v.strip('\'"')
+
     @field_validator('discord_webhook')
     @classmethod
     def validate_discord_webhook(cls, v):

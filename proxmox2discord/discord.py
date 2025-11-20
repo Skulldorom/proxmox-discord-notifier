@@ -32,27 +32,21 @@ def get_http_client() -> httpx.AsyncClient:
 def build_discord_payload(payload, log_url: str) -> dict:
     severity = (payload.severity or "unknown").lower()
     cfg = SEVERITY_CONFIG.get(severity, SEVERITY_CONFIG["unknown"])
-
-    # Build description with log link
-    description = payload.discord_description or ''
-    if description:
-        description += f"\n\n[📋 View full logs]({log_url})"
-    else:
-        description = f"[📋 View full logs]({log_url})"
+    desc = payload.discord_description or ''
 
     embed = {
         "title":  f"{cfg['emoji']} {payload.title or 'Notification'}",
-        "description": description,
+        "description": desc,
         "color": cfg["color"],
         "fields": [
             {"name": "Severity", "value": severity.capitalize(), "inline": True},
+            {"name": "Logs", "value": f"[View full logs]({log_url})", "inline": True},
         ],
         "timestamp": datetime.now().isoformat(),
     }
 
-    content = f"<@{payload.mention_user_id}>\n" if payload.mention_user_id else ""
     return {
-        "content": content,
+        "content": f"<@{payload.mention_user_id}>\n" if payload.mention_user_id else "",
         "embeds": [embed]
     }
 
