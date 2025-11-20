@@ -57,7 +57,21 @@ async def get_log(log_id: str) -> str:
     Fetch the full text of a stored Proxmox alert message.
 
     """
+    # Validate log_id to prevent path traversal attacks (CWE-22)
+    if not log_id.replace('-', '').replace('_', '').isalnum():
+        raise HTTPException(status_code=400, detail="Invalid log ID format")
+    
     log_path = settings.log_directory / f"{log_id}.log"
+    
+    # Ensure the resolved path is within the log directory
+    try:
+        log_path = log_path.resolve()
+        settings.log_directory.resolve()
+        if not str(log_path).startswith(str(settings.log_directory.resolve())):
+            raise HTTPException(status_code=400, detail="Invalid log ID")
+    except (ValueError, OSError):
+        raise HTTPException(status_code=400, detail="Invalid log ID")
+    
     if not log_path.exists():
         raise HTTPException(status_code=404, detail="Log not found")
     return log_path.read_text(encoding="utf-8")
