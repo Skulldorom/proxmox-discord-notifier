@@ -2,7 +2,7 @@ from pydantic import BaseModel, AnyUrl, Field, field_validator
 from urllib.parse import urlparse
 
 class Notify(BaseModel):
-    discord_webhook: AnyUrl
+    discord_webhook: AnyUrl | None = None
     # Limit message size to 10MB to prevent disk space exhaustion (CWE-400)
     message: str | None = Field(None, max_length=10_485_760)
     title: str | None = Field(None, max_length=256)
@@ -14,6 +14,9 @@ class Notify(BaseModel):
     @classmethod
     def validate_discord_webhook(cls, v):
         """Validate webhook URL to prevent SSRF attacks (CWE-918)"""
+        if v is None:
+            return v
+            
         url = str(v)
         parsed = urlparse(url)
         

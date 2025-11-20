@@ -27,6 +27,14 @@ async def notify(
     Forward a Proxmox alert to Discord and archive the full Proxmox message.
     """
 
+    # Use webhook from payload, or fallback to environment variable
+    webhook_url = payload.discord_webhook or settings.discord_webhook
+    if not webhook_url:
+        raise HTTPException(
+            status_code=400, 
+            detail="Discord webhook URL must be provided either in request payload or DISCORD_WEBHOOK environment variable"
+        )
+
     log_id = uuid.uuid4().hex
     log_url = str(request.url_for("get_log", log_id=log_id))
     log_path = settings.log_directory / f"{log_id}.log"
@@ -39,7 +47,7 @@ async def notify(
 
     discord_payload = build_discord_payload(payload, log_url)
     status_code = await send_discord_notification(
-        webhook_url=payload.discord_webhook,
+        webhook_url=webhook_url,
         payload=discord_payload,
     )
 
