@@ -32,5 +32,5 @@ jobs:
           tags: |
             ghcr.io/${{ env.REPO_LC }}:${{ github.sha }}
             ghcr.io/${{ env.REPO_LC }}:latest
-          cache-from: type=registry,ref=ghcr.io/${{ env.REPO_LC }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ env.REPO_LC }}:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ env.REPO_LC }}:latest
+          cache-to: type=inline
