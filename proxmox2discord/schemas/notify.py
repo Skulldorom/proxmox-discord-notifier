@@ -17,17 +17,18 @@ class Notify(BaseModel):
         url = str(v)
         parsed = urlparse(url)
         
-        # Only allow Discord webhook URLs
-        allowed_hosts = ['discord.com', 'discordapp.com']
-        if not any(parsed.netloc.endswith(host) or parsed.netloc == host for host in allowed_hosts):
-            raise ValueError('Webhook URL must be a valid Discord webhook URL')
-        
-        # Ensure HTTPS
+        # Ensure HTTPS (check first as it's fastest)
         if parsed.scheme != 'https':
             raise ValueError('Webhook URL must use HTTPS')
         
         # Validate it's a webhook endpoint
         if not parsed.path.startswith('/api/webhooks/'):
             raise ValueError('Invalid Discord webhook URL format')
+        
+        # Only allow Discord webhook URLs
+        netloc = parsed.netloc
+        if not (netloc == 'discord.com' or netloc == 'discordapp.com' or 
+                netloc.endswith('.discord.com') or netloc.endswith('.discordapp.com')):
+            raise ValueError('Webhook URL must be a valid Discord webhook URL')
             
         return v

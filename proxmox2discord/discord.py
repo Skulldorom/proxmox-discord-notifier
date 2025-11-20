@@ -14,15 +14,28 @@ SEVERITY_CONFIG = {
     "unknown": {"color": 0x95a5a6, "emoji": "❔"},
 }
 
+# Shared HTTP client for connection pooling (improves performance)
+_http_client: httpx.AsyncClient | None = None
+
+
+def get_http_client() -> httpx.AsyncClient:
+    """Get or create a shared httpx AsyncClient for connection pooling."""
+    global _http_client
+    if _http_client is None:
+        _http_client = httpx.AsyncClient(
+            timeout=10.0,
+            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        )
+    return _http_client
+
 
 def build_discord_payload(payload, log_url: str) -> dict:
     severity = (payload.severity or "unknown").lower()
     cfg = SEVERITY_CONFIG.get(severity, SEVERITY_CONFIG["unknown"])
-    desc = payload.discord_description or ''
 
     embed = {
         "title":  f"{cfg['emoji']} {payload.title or 'Notification'}",
-        "description": desc,
+        "description": payload.discord_description or '',
         "color": cfg["color"],
         "fields": [
             {"name": "Severity", "value": severity.capitalize(), "inline": True},
@@ -31,8 +44,9 @@ def build_discord_payload(payload, log_url: str) -> dict:
         "timestamp": datetime.now().isoformat(),
     }
 
+    content = f"<@{payload.mention_user_id}>\n" if payload.mention_user_id else ""
     return {
-        "content": f"<@{payload.mention_user_id}>\n" if payload.mention_user_id else "",
+        "content": content,
         "embeds": [embed]
     }
 
@@ -43,12 +57,12 @@ async def send_discord_notification(
     timeout: float = 10.0,
 ) -> int:
     """ Send a JSON payload to a Discord webhook URL. """
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            str(webhook_url),
-            json=payload,
-            timeout=timeout,
-        )
+    client = get_http_client()
+    response = await client.post(
+        str(webhook_url),
+        json=payload,
+        timeout=timeout,
+    )
 
     if response.status_code >= 400:
         raise HTTPException(
