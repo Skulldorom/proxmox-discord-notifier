@@ -32,6 +32,11 @@ def serve(
     """ Start proxmox2discord web server. """
 
     if uvicorn_config:
+        # Validate config file is a Python file to prevent unexpected behavior
+        if not str(uvicorn_config).endswith('.py'):
+            typer.echo("Error: Config file must be a Python (.py) file", err=True)
+            raise typer.Exit(code=1)
+            
         import subprocess
         subprocess.run(["uvicorn", "--config", str(uvicorn_config)])
         raise typer.Exit()
