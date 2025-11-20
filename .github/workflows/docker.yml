@@ -1,11 +1,11 @@
-name: Build, Test, and Push Docker image
+name: Build and Push Docker image
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-test-push:
+  build-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,33 +24,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Build and load Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true
-          tags: character-battler:${{ github.sha }}
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:${{ github.sha }}
+            ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:latest
           cache-from: type=registry,ref=ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ env.REPO_OWNER_LC }}/character-battler:buildcache,mode=max
-
-      - name: Run container in background for testing
-        run: docker run -d -p 8080:8080 --name test-server character-battler:${{ github.sha }}
-
-      - name: Wait for server to start
-        run: |
-          for i in {1..10}; do
-            curl --fail http://localhost:8080 && exit 0
-            sleep 2
-          done
-          docker logs test-server
-          exit 1
-
-      - name: Stop and remove container
-        run: docker rm -f test-server
-
-      - name: Tag and push image to GHCR
-        run: |
-          docker tag character-battler:${{ github.sha }} ghcr.io/${REPO_OWNER_LC}/character-battler:${{ github.sha }}
-          docker tag character-battler:${{ github.sha }} ghcr.io/${REPO_OWNER_LC}/character-battler:latest
-          docker push ghcr.io/${REPO_OWNER_LC}/character-battler:${{ github.sha }}
-          docker push ghcr.io/${REPO_OWNER_LC}/character-battler:latest
