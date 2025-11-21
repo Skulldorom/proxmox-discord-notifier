@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
 import asyncio
 import logging
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 
 from .endpoints import router
 from . import discord
@@ -44,7 +46,27 @@ def create_app() -> FastAPI:
         title='Proxmox2Discord',
         description='Proxmox Discord notifier service',
         lifespan=lifespan,
+        docs_url=None,  # Disable default docs to use custom one
+        redoc_url="/redoc",
     )
+    
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui_html():
+        # Load HTML template from file
+        template_path = Path(__file__).parent / "templates" / "swagger_ui.html"
+        try:
+            template_content = template_path.read_text()
+        except FileNotFoundError:
+            logger.error(f"Swagger UI template not found at {template_path}")
+            raise HTTPException(status_code=500, detail="Documentation template not found")
+        
+        # Format template with dynamic values
+        html_content = template_content.format(
+            title=app.title,
+            openapi_url=app.openapi_url
+        )
+        
+        return HTMLResponse(content=html_content, media_type="text/html")
 
     app.include_router(router)
 
