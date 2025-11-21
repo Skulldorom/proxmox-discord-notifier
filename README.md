@@ -171,14 +171,16 @@ docker exec proxmox2discord find /var/logs/p2d -name "*.log" -type f -mtime +30 
 
 ```bash
 # Remove logs older than 30 days from the default location
-find ~/logs -name "*.log" -type f -mtime +30 -delete
+# Default: ./logs (relative to where the application is run)
+find ./logs -name "*.log" -type f -mtime +30 -delete
 ```
 
 You can also set up a cron job to automatically clean up old logs:
 
 ```bash
 # Add to crontab (runs daily at 2 AM)
-0 2 * * * find ~/logs -name "*.log" -type f -mtime +30 -delete
+# Replace ./logs with your actual log directory path
+0 2 * * * find /path/to/your/logs -name "*.log" -type f -mtime +30 -delete
 ```
 
 ### Future Plans
