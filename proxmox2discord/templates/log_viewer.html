@@ -102,6 +102,15 @@
             flex-shrink: 0;
         }
         
+        .footer a {
+            color: #4ec9b0;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 768px) {
             .header, .content {
                 padding: 15px;
@@ -119,7 +128,7 @@
             <div class="log-text">{{ log_content }}</div>
         </div>
         <div class="footer">
-            Proxmox2Discord Log Viewer
+            <a href="https://github.com/Skulldorom/proxmox2discord" target="_blank">Proxmox2Discord Log Viewer</a>
         </div>
     </div>
 </body>
