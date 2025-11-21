@@ -2,6 +2,7 @@ FROM python:3.12.11-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
+ENV LOG_RETENTION_DAYS=30
 
 ARG APP_DIR=/opt/proxmox2discord
 ENV LOG_DIRECTORY=/var/logs/p2d
