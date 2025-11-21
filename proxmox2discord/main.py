@@ -54,7 +54,11 @@ def create_app() -> FastAPI:
     async def custom_swagger_ui_html():
         # Load HTML template from file
         template_path = Path(__file__).parent / "templates" / "swagger_ui.html"
-        template_content = template_path.read_text()
+        try:
+            template_content = template_path.read_text()
+        except FileNotFoundError:
+            logger.error(f"Swagger UI template not found at {template_path}")
+            raise HTTPException(status_code=500, detail="Documentation template not found")
         
         # Format template with dynamic values
         html_content = template_content.format(
