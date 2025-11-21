@@ -1,4 +1,4 @@
-# proxmox2discord
+# proxmox-discord-notifier
 
 Reliable Proxmox Backup and VM Log Notifications in Discord
 
@@ -11,7 +11,7 @@ Discord enforces a 2000‑character limit per message, which can truncate length
 - Capturing full Proxmox output in raw log files.
 - Sending concise Discord notifications with a link to the complete log.
 
-Whether you run nightly backups or ad‑hoc snapshots, Proxmox2Discord ensures you never miss important context.
+Whether you run nightly backups or ad‑hoc snapshots, **proxmox-discord-notifier** ensures you never miss important context.
 
 ## Features
 
@@ -34,14 +34,14 @@ Run with Docker.
 
 ```bash
 docker run -d \
-  --name proxmox2discord \
+  --name proxmox-discord-notifier \
   --restart unless-stopped \
   -e TZ=UTC \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
   -e LOG_RETENTION_DAYS=30 \
   -p 6068:6068 \
   -v p2d_logs:/var/logs/p2d \
-  ghcr.io/skulldorom/proxmox2discord:latest
+  ghcr.io/skulldorom/proxmox-discord-notifier:latest
 ```
 
 Optionally you can use docker-compose as well.
@@ -50,9 +50,9 @@ Optionally you can use docker-compose as well.
 version: "3.9"
 
 services:
-  proxmox2discord:
-    container_name: proxmox2discord
-    image: ghcr.io/skulldorom/proxmox2discord:latest
+  proxmox-discord-notifier:
+    container_name: proxmox-discord-notifier
+    image: ghcr.io/skulldorom/proxmox-discord-notifier:latest
     restart: unless-stopped
     volumes:
       - p2d_logs:/var/logs/p2d
@@ -94,11 +94,11 @@ If your service is behind a reverse proxy or accessed via a custom domain, set t
 ```bash
 # Example for Docker
 docker run -d \
-  --name proxmox2discord \
+  --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
   -e BASE_URL="https://your-domain.com" \
   -p 6068:6068 \
-  ghcr.io/skulldorom/proxmox2discord:latest
+  ghcr.io/skulldorom/proxmox-discord-notifier:latest
 ```
 
 Or in docker-compose:
@@ -122,11 +122,11 @@ By default, logs are kept for 30 days and then automatically deleted. You can co
 ```bash
 # Example: Keep logs for 7 days
 docker run -d \
-  --name proxmox2discord \
+  --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
   -e LOG_RETENTION_DAYS=7 \
   -p 6068:6068 \
-  ghcr.io/skulldorom/proxmox2discord:latest
+  ghcr.io/skulldorom/proxmox-discord-notifier:latest
 ```
 
 Or in docker-compose:
@@ -144,7 +144,7 @@ If you set the `DISCORD_WEBHOOK` environment variable, you can omit it from the 
 
 | UI Field          | Value / Example                                                                                                                                                                      |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Endpoint Name** | `proxmox2discord `                                                                                                                                                                   |
+| **Endpoint Name** | `proxmox-discord-notifier`                                                                                                                                                           |
 | **Method**        | `POST`                                                                                                                                                                               |
 | **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                             |
 | **Headers**       | `Content-Type: application/json`                                                                                                                                                     |
@@ -158,7 +158,7 @@ If you prefer to include the webhook in each request or need per-request webhook
 
 | UI Field          | Value / Example                                                                                                                                                                                                                                                                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Endpoint Name** | `proxmox2discord `                                                                                                                                                                                                                                                                    |
+| **Endpoint Name** | `proxmox-discord-notifier`                                                                                                                                                                                                                                                            |
 | **Method**        | `POST`                                                                                                                                                                                                                                                                                |
 | **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                                                                                                                              |
 | **Headers**       | `Content-Type: application/json`                                                                                                                                                                                                                                                      |
@@ -176,4 +176,4 @@ This project is maintained by [Skulldorom](https://github.com/Skulldorom). While
 
 Released under the [MIT License](LICENSE).
 
-Copyright (c) 2025 Skulldorom (Jordan Shaw)
+Copyright (c) 2025 Jordan Shaw

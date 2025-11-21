@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 
-app = typer.Typer(help="Manage and run the proxmox2discord web server.")
+app = typer.Typer(help="Manage and run the proxmox-discord-notifier web server.")
 
 
 @app.command()
@@ -29,10 +29,10 @@ def serve(
         help="Path to a Uvicorn config file (Python).",
     ),
 ):
-    """ Start proxmox2discord web server. """
+    """ Start proxmox-discord-notifier web server. """
 
     uvicorn_kwargs = {
-        "app": "proxmox2discord.main:app",
+        "app": "proxmox_discord_notifier.main:app",
         "host": host,
         "port": port,
         "log_level": log_level,

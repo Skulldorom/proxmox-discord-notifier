@@ -1,6 +1,6 @@
 FROM python:3.12.11-slim-bookworm
 
-LABEL org.opencontainers.image.title="proxmox2discord"
+LABEL org.opencontainers.image.title="proxmox-discord-notifier"
 LABEL org.opencontainers.image.description="Proxmox Discord notifier service"
 LABEL org.opencontainers.image.authors="Skulldorom <51134009+Skulldorom@users.noreply.github.com>"
 LABEL org.opencontainers.image.url="https://github.com/Skulldorom/proxmox2discord"
@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
 ENV LOG_RETENTION_DAYS=30
 
-ARG APP_DIR=/opt/proxmox2discord
+ARG APP_DIR=/opt/proxmox-discord-notifier
 ENV LOG_DIRECTORY=/var/logs/p2d
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -39,4 +39,4 @@ RUN printf '#!/bin/sh\n' > /usr/local/bin/docker-entrypoint.sh \
 
 EXPOSE 6068
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["uv", "run", "proxmox2discord", "--host", "0.0.0.0", "--port", "6068"]
+CMD ["uv", "run", "proxmox-discord-notifier", "--host", "0.0.0.0", "--port", "6068"]

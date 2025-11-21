@@ -1,5 +1,5 @@
 [project]
-name = "proxmox2discord"
+name = "proxmox-discord-notifier"
 version = "0.1.0"
 description = "Proxmox Discord notifier service"
 readme = "README.md"
@@ -25,7 +25,7 @@ Repository = "https://github.com/Skulldorom/proxmox2discord"
 Issues = "https://github.com/Skulldorom/proxmox2discord/issues"
 
 [project.scripts]
-proxmox2discord = "proxmox2discord.cli:app"
+proxmox-discord-notifier = "proxmox_discord_notifier.cli:app"
 
 [build-system]
 requires = ["hatchling"]

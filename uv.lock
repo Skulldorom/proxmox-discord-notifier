@@ -390,7 +390,7 @@ wheels = [
 ]
 
 [[package]]
-name = "proxmox2discord"
+name = "proxmox-discord-notifier"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
