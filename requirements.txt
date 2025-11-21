@@ -42,7 +42,7 @@ email-validator==2.2.0 \
 fastapi==0.115.14 \
     --hash=sha256:6c0c8bf9420bd58f565e585036d971872472b4f7d3f6c73b698e10cffdefb3ca \
     --hash=sha256:b1de15cdc1c499a4da47914db35d0e4ef8f1ce62b624e94e0e5824421df99739
-    # via proxmox2discord
+    # via proxmox-discord-notifier
 fastapi-cli==0.0.7 \
     --hash=sha256:02b3b65956f526412515907a0793c9094abd4bfb5457b389f645b0ea6ba3605e \
     --hash=sha256:d549368ff584b2804336c61f192d86ddea080c11255f375959627911944804f4
@@ -79,7 +79,7 @@ httpx==0.28.1 \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
     # via
     #   fastapi
-    #   proxmox2discord
+    #   proxmox-discord-notifier
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
@@ -137,7 +137,7 @@ pydantic==2.10.6 \
     --hash=sha256:ca5daa827cce33de7a42be142548b0096bf05a7e7b365aebfa5f8eeec7128236
     # via
     #   fastapi
-    #   proxmox2discord
+    #   proxmox-discord-notifier
     #   pydantic-settings
 pydantic-core==2.27.2 \
     --hash=sha256:05e3a55d124407fffba0dd6b0c0cd056d10e983ceb4e5dbd10dda135c31071d6 \
@@ -173,7 +173,7 @@ pydantic-core==2.27.2 \
 pydantic-settings==2.8.1 \
     --hash=sha256:81942d5ac3d905f7f3ee1a70df5dfb62d5569c12f51a5a647defc1c3d9ee2e9c \
     --hash=sha256:d5c663dfbe9db9d5e1c646b2e161da12f0d734d422ee56f567d0ea2cee4e8585
-    # via proxmox2discord
+    # via proxmox-discord-notifier
 pygments==2.19.2 \
     --hash=sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887 \
     --hash=sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b
@@ -236,7 +236,7 @@ typer==0.16.0 \
     --hash=sha256:af377ffaee1dbe37ae9440cb4e8f11686ea5ce4e9bae01b84ae7c63b87f1dd3b
     # via
     #   fastapi-cli
-    #   proxmox2discord
+    #   proxmox-discord-notifier
 typing-extensions==4.14.1 \
     --hash=sha256:38b39f4aeeab64884ce9f74c94263ef78f3c22467c8724005483154c26648d36 \
     --hash=sha256:d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76

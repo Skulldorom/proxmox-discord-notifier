@@ -6,7 +6,7 @@ Reliable Proxmox Backup and VM Log Notifications in Discord
 
 ## Overview
 
-Discord enforces a 2000‑character limit per message, which can truncate lengthy Proxmox backup logs or VM events and obscure critical details. **Proxmox2Discord** solves this by:
+Discord enforces a 2000‑character limit per message, which can truncate lengthy Proxmox backup logs or VM events and obscure critical details. **proxmox-discord-notifier** solves this by:
 
 - Capturing full Proxmox output in raw log files.
 - Sending concise Discord notifications with a link to the complete log.
@@ -133,7 +133,7 @@ Or in docker-compose:
 
 ```yaml
 environment:
-  - LOG_RETENTION_DAYS=0  # Never delete logs
+  - LOG_RETENTION_DAYS=0 # Never delete logs
 ```
 
 The cleanup task runs automatically every 24 hours starting when the application launches.

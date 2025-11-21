@@ -20,9 +20,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Skulldorom/proxmox2discord"
-Repository = "https://github.com/Skulldorom/proxmox2discord"
-Issues = "https://github.com/Skulldorom/proxmox2discord/issues"
+Homepage = "https://github.com/Skulldorom/proxmox-discord-notifier"
+Repository = "https://github.com/Skulldorom/proxmox-discord-notifier"
+Issues = "https://github.com/Skulldorom/proxmox-discord-notifier/issues"
 
 [project.scripts]
 proxmox-discord-notifier = "proxmox_discord_notifier.cli:app"

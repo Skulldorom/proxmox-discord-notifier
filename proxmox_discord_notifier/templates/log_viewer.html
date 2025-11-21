@@ -1,135 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Proxmox Log - {{ log_id }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        body {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #252526;
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #2d2d30;
-            padding: 20px 30px;
-            border-bottom: 2px solid #3e3e42;
-            flex-shrink: 0;
-        }
-        
-        .header h1 {
-            color: #8147ff;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        
-        .log-id {
-            color: #9cdcfe;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        font-family: "Consolas", "Monaco", "Courier New", monospace;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #252526;
+        overflow: hidden;
+      }
+
+      .header {
+        background: #2d2d30;
+        padding: 20px 30px;
+        border-bottom: 2px solid #3e3e42;
+        flex-shrink: 0;
+      }
+
+      .header h1 {
+        color: #8147ff;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .log-id {
+        color: #9cdcfe;
+        font-size: 14px;
+        opacity: 0.8;
+      }
+
+      .content {
+        flex: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .log-text {
+        flex: 1;
+        background: #1e1e1e;
+        padding: 20px;
+        border-radius: 4px;
+        border: 1px solid #3e3e42;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-size: 14px;
+        color: #cccccc;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+
+      .log-text::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      .log-text::-webkit-scrollbar-track {
+        background: #1e1e1e;
+      }
+
+      .log-text::-webkit-scrollbar-thumb {
+        background: #3e3e42;
+        border-radius: 6px;
+      }
+
+      .log-text::-webkit-scrollbar-thumb:hover {
+        background: #4e4e52;
+      }
+
+      .footer {
+        padding: 15px 30px;
+        background: #2d2d30;
+        border-top: 1px solid #3e3e42;
+        text-align: center;
+        color: #858585;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      .footer a {
+        color: #8147ff;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .header,
         .content {
-            flex: 1;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+          padding: 15px;
         }
-        
-        .log-text {
-            flex: 1;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 4px;
-            border: 1px solid #3e3e42;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-size: 14px;
-            color: #cccccc;
-            overflow-y: auto;
-            overflow-x: auto;
-        }
-        
-        .log-text::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
-        }
-        
-        .log-text::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-        
-        .log-text::-webkit-scrollbar-thumb {
-            background: #3e3e42;
-            border-radius: 6px;
-        }
-        
-        .log-text::-webkit-scrollbar-thumb:hover {
-            background: #4e4e52;
-        }
-        
-        .footer {
-            padding: 15px 30px;
-            background: #2d2d30;
-            border-top: 1px solid #3e3e42;
-            text-align: center;
-            color: #858585;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-        
-        .footer a {
-            color: #8147ff;
-            text-decoration: none;
-        }
-        
-        .footer a:hover {
-            text-decoration: underline;
-        }
-        
-        @media (max-width: 768px) {
-            .header, .content {
-                padding: 15px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>📋 Proxmox Log Viewer</h1>
-            <div class="log-id">Log ID: {{ log_id }}</div>
-        </div>
-        <div class="content">
-            <div class="log-text">{{ log_content }}</div>
-        </div>
-        <div class="footer">
-            <a href="https://github.com/Skulldorom/proxmox2discord" target="_blank">Proxmox2Discord Log Viewer</a>
-        </div>
+      <div class="header">
+        <h1>📋 Proxmox Log Viewer</h1>
+        <div class="log-id">Log ID: {{ log_id }}</div>
+      </div>
+      <div class="content">
+        <div class="log-text">{{ log_content }}</div>
+      </div>
+      <div class="footer">
+        <a
+          href="https://github.com/Skulldorom/proxmox-discord-notifier"
+          target="_blank"
+          >proxmox-discord-notifier Log Viewer</a
+        >
+      </div>
     </div>
-</body>
+  </body>
 </html>
