@@ -18,7 +18,7 @@ Whether you run nightly backups or ad‑hoc snapshots, Proxmox2Discord ensures y
 - Raw Log Storage: Saves complete Proxmox logs in a configurable directory.
 - Discord Embeds: Sends rich notifications with title, severity, and log link.
 - Optional User Mentions: Include a Discord user ID to automatically @mention a specific user in the alert.
-- Configurable Retention: Auto-cleanup of old logs after _N_ days. _Coming Soon!_
+- Configurable Retention: Auto-cleanup of old logs after _N_ days (default: 30 days).
 - Lightweight: Single Python package; minimal dependencies.
 - Docker‑Ready: Official Dockerfile for fast deployment.
 
@@ -38,6 +38,7 @@ docker run -d \
   --restart unless-stopped \
   -e TZ=UTC \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_RETENTION_DAYS=30 \
   -p 6068:6068 \
   -v p2d_logs:/var/logs/p2d \
   ghcr.io/skulldorom/proxmox2discord:latest
@@ -58,6 +59,7 @@ services:
     environment:
       - TZ=UTC
       - DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+      - LOG_RETENTION_DAYS=30
     ports:
       - "6068:6068"
 
@@ -116,6 +118,33 @@ environment:
 ```
 
 Without `BASE_URL`, log URLs are generated from the incoming request, which may not work correctly behind a proxy.
+
+#### Log Retention
+
+By default, logs are kept for 30 days and then automatically deleted. You can configure this behavior using the `LOG_RETENTION_DAYS` environment variable:
+
+- **Default**: `30` (keeps logs for 30 days)
+- **Never delete**: Set to `0` to keep logs forever
+- **Custom duration**: Set to any positive number of days
+
+```bash
+# Example: Keep logs for 7 days
+docker run -d \
+  --name proxmox2discord \
+  -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_RETENTION_DAYS=7 \
+  -p 6068:6068 \
+  ghcr.io/skulldorom/proxmox2discord:latest
+```
+
+Or in docker-compose:
+
+```yaml
+environment:
+  - LOG_RETENTION_DAYS=0  # Never delete logs
+```
+
+The cleanup task runs automatically every 24 hours starting when the application launches.
 
 ### Setup with Environment Variable
 

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     log_directory: Path = Path().cwd() / "logs"
     discord_webhook: AnyUrl | None = None
     base_url: str | None = None  # Custom base URL for when behind a proxy
-    # log_retention_days: int = 7
+    log_retention_days: int = 30  # Number of days to keep logs (0 = keep forever)
 
     @field_validator("log_directory", mode='after')
     def create_log_directory(cls, v):
