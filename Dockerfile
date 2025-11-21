@@ -1,5 +1,12 @@
 FROM python:3.12.11-slim-bookworm
 
+LABEL org.opencontainers.image.title="proxmox2discord"
+LABEL org.opencontainers.image.description="Proxmox Discord notifier service"
+LABEL org.opencontainers.image.authors="Skulldorom <51134009+Skulldorom@users.noreply.github.com>"
+LABEL org.opencontainers.image.url="https://github.com/Skulldorom/proxmox2discord"
+LABEL org.opencontainers.image.source="https://github.com/Skulldorom/proxmox2discord"
+LABEL org.opencontainers.image.licenses="MIT"
+
 ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
 ENV LOG_RETENTION_DAYS=30
