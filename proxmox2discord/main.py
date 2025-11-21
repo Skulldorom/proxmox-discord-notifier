@@ -17,8 +17,9 @@ async def lifespan(app: FastAPI):
     # Startup: run initial cleanup and start periodic task
     cleanup_task = None
     try:
-        logger.info("Running initial log cleanup...")
-        await cleanup_old_logs()
+        # Run initial cleanup in background to avoid blocking startup
+        asyncio.create_task(cleanup_old_logs())
+        logger.info("Scheduled initial log cleanup")
         
         # Start periodic cleanup task
         cleanup_task = asyncio.create_task(periodic_cleanup_task())

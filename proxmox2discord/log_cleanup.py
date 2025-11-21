@@ -9,6 +9,9 @@ from .config import settings
 
 logger = logging.getLogger(__name__)
 
+# Cleanup runs every 24 hours (in seconds)
+CLEANUP_INTERVAL_SECONDS = 86400
+
 
 async def cleanup_old_logs() -> int:
     """
@@ -66,5 +69,5 @@ async def periodic_cleanup_task():
         except Exception as e:
             logger.error(f"Error in periodic cleanup task: {e}")
         
-        # Wait 24 hours before next cleanup
-        await asyncio.sleep(86400)  # 24 hours in seconds
+        # Wait before next cleanup
+        await asyncio.sleep(CLEANUP_INTERVAL_SECONDS)
