@@ -13,9 +13,7 @@ def serve(
     host: str = typer.Option(
         "127.0.0.1", "--host", "-h", help="Host/IP to bind the server on."
     ),
-    port: int = typer.Option(
-        6068, "--port", "-p", help="Port to listen on."
-    ),
+    port: int = typer.Option(6068, "--port", "-p", help="Port to listen on."),
     log_level: str = typer.Option(
         "info", "--log-level", "-l", help="Uvicorn log level."
     ),
@@ -29,7 +27,28 @@ def serve(
         help="Path to a Uvicorn config file (Python).",
     ),
 ):
-    """ Start proxmox-discord-notifier web server. """
+    """Start proxmox-discord-notifier web server."""
+
+    # Print ASCII skull
+    skull = r"""
+            ⠄⠄⠄⠄⠄⠄⠄⣀⣠⣤⣤⣤⣤⣀⡀
+            ⠄⠄⠄⣠⣤⢶⣻⣿⣻⣿⣿⣿⣿⣿⣿⣦⣤⣀
+            ⠄⠄⣼⣺⢷⣻⣽⣾⣿⢿⣿⣷⣿⣿⢿⣿⣿⣿⣇
+            ⠠⡍⢾⣺⢽⡳⣻⡺⣽⢝⢗⢯⣻⢽⣻⣿⣿⣿⣿⢿⡄
+            ⡨⣖⢹⠜⢅⢫⢊⢎⠜⢌⠣⢑⠡⣹⡸⣜⣯⣿⢿⣻⣷
+            ⢜⢔⡹⡭⣪⢼⠽⠷⠧⣳⢘⢔⡝⠾⠽⢿⣷⣿⣟⢷⣟
+            ⢸⢘⢼⠿⠟⠁⠄⠄⡀⠄⠃⠑⡌⠄⠄⠈⠙⠿⣷⢽⣻
+            ⢌⠂⠅⠄⠄⠄⠄⠄⠄⡀⣲⣢⢂⠄⠄⠄⠄⠄⠈⣯⠏
+            ⠐⠨⡂⠄⠄⠄⠄⠄⡀⡔⠋⢻⣤⡀⠄⠄⢀⠄⢸⣯⠇
+            ⠈⣕⠝⠒⠄⠄⠒⢉⠪⠄⠄⠄⢿⠜⠑⠢⠠⡒⡺⣿⠖
+            ⠄⠐⠅⠁⡀⠄⠐⢔⠁⠄⠄⠄⢀⢇⢌⠄⠄⠄⠸⠕
+            ⠄⠄⠂⠄⠄⠨⣔⡝⠼⡄⠂⣦⡆⣿⣲⠐⠑⠁⠄⠃
+            ⠄⠄⠄⠄⠄⠄⠃⢫⢛⣙⡊⣜⣏⡝⣝⠆
+            ⠄⠄⠄⠄⠄⠄⠈⠈⠁⠁⠁⠈⠈⠊
+            
+            Proxmox Discord Notifier - Starting...
+    """
+    typer.echo(skull)
 
     uvicorn_kwargs = {
         "app": "proxmox_discord_notifier.main:app",
@@ -40,18 +59,19 @@ def serve(
 
     if uvicorn_config:
         # Validate config file is a Python file to prevent unexpected behavior
-        if not str(uvicorn_config).endswith('.py'):
+        if not str(uvicorn_config).endswith(".py"):
             typer.echo("Error: Config file must be a Python (.py) file", err=True)
             raise typer.Exit(code=1)
-        
+
         # Load additional config from file
         import importlib.util
+
         spec = importlib.util.spec_from_file_location("uvicorn_config", uvicorn_config)
         if spec and spec.loader:
             config_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(config_module)
             # Merge config from module with CLI args (CLI args take precedence)
-            if hasattr(config_module, 'CONFIG'):
+            if hasattr(config_module, "CONFIG"):
                 uvicorn_kwargs.update(config_module.CONFIG)
 
     uvicorn.run(**uvicorn_kwargs)
