@@ -72,14 +72,6 @@ volumes:
 docker compose up -d
 ```
 
-### Run Manually
-
-```bash
-# Set the Discord webhook (optional if provided in request)
-export DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
-proxmox2discord
-```
-
 ### Verify
 
 Open [http://<YOUR_HOST>:6068/docs](http://<YOUR_HOST>:6068/docs) for the interactive API docs.
