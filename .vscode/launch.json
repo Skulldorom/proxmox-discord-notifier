@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run proxmox-discord-notifier",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "proxmox_discord_notifier.cli",
+            "args": ["serve"],
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
