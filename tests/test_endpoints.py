@@ -37,19 +37,15 @@ async def test_notify_missing_webhook_400(client, valid_payload):
 
 @pytest.mark.asyncio
 async def test_notify_no_message(client, mock_httpx_post, tmp_log_dir):
-    """POST /api/notify with webhook but no message field — message=None is
-    accepted by the schema but write_text(None) fails at the I/O layer (500).
-    This is expected current behaviour; the code path for None messages should
-    eventually be guarded earlier."""
+    """POST /api/notify with webhook but no message field → 400 with clear error."""
     response = await client.post(
         "/api/notify",
         json={
             "discord_webhook": "https://discord.com/api/webhooks/123/abc",
         },
     )
-    # Currently returns 500 because write_text(None) raises TypeError.
-    # If the code is fixed to handle None gracefully, adjust to 200.
-    assert response.status_code == 500
+    assert response.status_code == 400
+    assert "message" in response.json()["detail"].lower()
 
 
 @pytest.mark.asyncio
