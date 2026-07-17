@@ -106,9 +106,7 @@ async def test_logs_valid_id_html(client, tmp_log_dir):
 @pytest.mark.asyncio
 async def test_logs_html_escapes_special_chars(client, tmp_log_dir):
     """Log content with < and > should be HTML-escaped in HTML response.
-    Note: endpoints.py manually replaces < and > AND Jinja2 auto-escapes
-    via {{ }}, producing double-escaped &amp;lt; &amp;gt; in the final
-    HTML. The rendered output is safe; it just goes through two layers."""
+    Jinja2's |e filter handles all HTML entities correctly."""
     log_id = uuid.uuid4().hex
     content = "<script>alert('xss')</script>"
     (tmp_log_dir / f"{log_id}.log").write_text(content)
@@ -119,8 +117,8 @@ async def test_logs_html_escapes_special_chars(client, tmp_log_dir):
     )
     assert response.status_code == 200
     assert "<script>" not in response.text
-    # Double-escaped because both manual replace + Jinja2 auto-escape
-    assert "&amp;lt;script&amp;gt;" in response.text
+    # Jinja2 |e filter single-escapes (no manual pre-escaping needed)
+    assert "&lt;script&gt;" in response.text
 
 
 @pytest.mark.asyncio
