@@ -5,7 +5,6 @@ import httpx
 from fastapi import HTTPException
 from pydantic import AnyUrl
 
-
 SEVERITY_CONFIG = {
     "info":    {"color": 0x3498db, "emoji": "ℹ️"},
     "notice":  {"color": 0x2ecc71, "emoji": "🔔"},
@@ -16,6 +15,14 @@ SEVERITY_CONFIG = {
 
 # Shared HTTP client for connection pooling (improves performance)
 _http_client: httpx.AsyncClient | None = None
+
+
+async def close_client() -> None:
+    """Close the shared HTTP client if it was created."""
+    global _http_client
+    if _http_client is not None:
+        await _http_client.aclose()
+        _http_client = None
 
 
 def get_http_client() -> httpx.AsyncClient:

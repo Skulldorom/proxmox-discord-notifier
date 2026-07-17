@@ -1,8 +1,9 @@
 from pathlib import Path
 
+from pydantic import AnyUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator, AnyUrl
-from urllib.parse import urlparse
+
+from .validation import validate_discord_webhook
 
 
 class Settings(BaseSettings):
@@ -31,24 +32,8 @@ class Settings(BaseSettings):
         """Validate webhook URL to prevent SSRF attacks (CWE-918)"""
         if v is None:
             return v
-            
-        url = str(v)
-        parsed = urlparse(url)
-        
-        # Ensure HTTPS (check first as it's fastest)
-        if parsed.scheme != 'https':
-            raise ValueError('Webhook URL must use HTTPS')
-        
-        # Validate it's a webhook endpoint
-        if not parsed.path.startswith('/api/webhooks/'):
-            raise ValueError('Invalid Discord webhook URL format')
-        
-        # Only allow Discord webhook URLs
-        netloc = parsed.netloc
-        if not (netloc == 'discord.com' or netloc == 'discordapp.com' or 
-                netloc.endswith('.discord.com') or netloc.endswith('.discordapp.com')):
-            raise ValueError('Webhook URL must be a valid Discord webhook URL')
-            
+
+        validate_discord_webhook(str(v))
         return v
 
     model_config = SettingsConfigDict()
