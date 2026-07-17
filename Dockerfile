@@ -36,6 +36,8 @@ RUN printf '#!/bin/sh\n' > /usr/local/bin/docker-entrypoint.sh \
     && printf 'exec "$@"\n' >> /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:6068/health')" || exit 1
 
 EXPOSE 6068
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
