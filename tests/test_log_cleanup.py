@@ -6,9 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from proxmox_discord_notifier.log_cleanup import cleanup_old_logs
 from proxmox_discord_notifier.config import Settings
-
+from proxmox_discord_notifier.log_cleanup import cleanup_old_logs
 
 # ── helpers ─────────────────────────────────────────────────────────
 
@@ -18,7 +17,6 @@ def _touch(path: Path, days_old: int = 0):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("mock log content")
     old_time = time.time() - (days_old * 86400)
-    os_stat = path.stat()
     os.utime(str(path), (old_time, old_time))
 
 

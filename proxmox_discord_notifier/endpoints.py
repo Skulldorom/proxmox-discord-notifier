@@ -1,16 +1,15 @@
 import uuid
 from pathlib import Path
-
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import PlainTextResponse
-from fastapi.templating import Jinja2Templates
 from typing import Any
 
-from .discord import build_discord_payload, send_discord_notification
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import PlainTextResponse
+from fastapi.templating import Jinja2Templates
+
 from .config import settings
+from .discord import build_discord_payload, send_discord_notification
 from .schemas.notify import Notify
 from .schemas.responses import NotifyResponse
-
 
 # Setup Jinja2 templates
 templates_dir = Path(__file__).parent / "templates"
@@ -39,7 +38,10 @@ async def notify(
     if not webhook_url:
         raise HTTPException(
             status_code=400,
-            detail="Discord webhook URL must be provided either in request payload or DISCORD_WEBHOOK environment variable",
+            detail=(
+                "Discord webhook URL must be provided either in"
+                " request payload or DISCORD_WEBHOOK environment variable"
+            ),
         )
 
     log_id = uuid.uuid4().hex

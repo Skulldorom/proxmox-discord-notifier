@@ -39,6 +39,14 @@ testpaths = ["tests"]
 [project.scripts]
 proxmox-discord-notifier = "proxmox_discord_notifier.cli:app"
 
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = ["N805"]  # false positive on pydantic field_validators
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

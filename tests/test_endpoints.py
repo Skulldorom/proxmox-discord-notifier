@@ -5,10 +5,6 @@ import uuid
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from proxmox_discord_notifier.config import Settings
-from proxmox_discord_notifier.main import create_app
-
-
 # ── /api/notify ─────────────────────────────────────────────────────
 
 
@@ -59,8 +55,7 @@ async def test_notify_no_message(client, mock_httpx_post, tmp_log_dir):
 @pytest.mark.asyncio
 async def test_notify_discord_failure(client, full_payload, tmp_log_dir):
     """When Discord returns 4xx/5xx, endpoint should propagate the error."""
-    import httpx
-    from unittest.mock import patch, AsyncMock
+    from unittest.mock import AsyncMock, patch
 
     mock_response = AsyncMock()
     mock_response.status_code = 429
@@ -166,6 +161,7 @@ async def test_logs_id_with_dash_underscore_accepted(client, tmp_log_dir):
 async def test_notify_with_base_url(client, tmp_log_dir, full_payload, mock_httpx_post):
     """When base_url is set, log URL uses it instead of request URL."""
     from unittest.mock import patch
+
     from proxmox_discord_notifier.config import Settings as AppSettings
 
     custom_settings = AppSettings(
