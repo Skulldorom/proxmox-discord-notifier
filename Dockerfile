@@ -24,7 +24,7 @@ RUN apt-get update && \
     apt-get install -y tzdata  && \
     apt-get clean
 
-ADD . $APP_DIR/
+COPY . $APP_DIR/
 
 RUN uv sync --locked
 
