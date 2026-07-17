@@ -1,7 +1,34 @@
-.venv
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
 .venv/*
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# CI / GitHub
+.github/
+
+# Tests
+tests/
+
+# Docs
 docs/
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
 dockercleanup.sh
 Dockerfile
-
-
+.hermes/
