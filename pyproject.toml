@@ -24,6 +24,18 @@ Homepage = "https://github.com/Skulldorom/proxmox-discord-notifier"
 Repository = "https://github.com/Skulldorom/proxmox-discord-notifier"
 Issues = "https://github.com/Skulldorom/proxmox-discord-notifier/issues"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.28",
+    "pytest-cov>=5.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
 [project.scripts]
 proxmox-discord-notifier = "proxmox_discord_notifier.cli:app"
 
