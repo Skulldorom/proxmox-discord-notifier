@@ -18,6 +18,13 @@ templates = Jinja2Templates(directory=str(templates_dir))
 
 
 router = APIRouter(prefix="/api")
+health_router = APIRouter()
+
+
+@health_router.get("/health")
+async def health() -> dict[str, str]:
+    """Health check endpoint for probe/readiness checks."""
+    return {"status": "ok"}
 
 
 @router.post(
@@ -106,7 +113,7 @@ async def get_log(log_id: str, request: Request):
             {
                 "request": request,
                 "log_id": log_id,
-                "log_content": log_content.replace("<", "&lt;").replace(">", "&gt;"),
+                "log_content": log_content,
             },
         )
     else:

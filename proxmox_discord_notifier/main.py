@@ -4,7 +4,7 @@ import logging
 
 from fastapi import FastAPI, HTTPException
 
-from .endpoints import router
+from .endpoints import router, health_router
 from . import discord
 from .log_cleanup import periodic_cleanup_task, cleanup_old_logs
 
@@ -47,6 +47,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(router)
+    app.include_router(health_router)
 
     return app
 
