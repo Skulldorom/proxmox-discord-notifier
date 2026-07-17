@@ -24,7 +24,7 @@ Homepage = "https://github.com/Skulldorom/proxmox-discord-notifier"
 Repository = "https://github.com/Skulldorom/proxmox-discord-notifier"
 Issues = "https://github.com/Skulldorom/proxmox-discord-notifier/issues"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
