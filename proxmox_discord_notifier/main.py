@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from . import discord
-from .endpoints import router
+from .endpoints import health_router, router
 from .log_cleanup import cleanup_old_logs, periodic_cleanup_task
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(router)
+    app.include_router(health_router)
 
     return app
 

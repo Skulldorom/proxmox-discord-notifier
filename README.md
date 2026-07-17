@@ -49,8 +49,6 @@ docker run -d \
 Optionally you can use docker-compose as well.
 
 ```
-version: "3.9"
-
 services:
   proxmox-discord-notifier:
     container_name: proxmox-discord-notifier

@@ -13,10 +13,10 @@ maintainers = [
 ]
 dependencies = [
     "fastapi[standard]",
-    "httpx==0.28.1",
-    "pydantic==2.13.4",
-    "pydantic-settings==2.14.2",
-    "typer==0.27.0",
+    "httpx>=0.28.1,<0.29",
+    "pydantic>=2.13.4,<2.14",
+    "pydantic-settings>=2.14.2,<2.15",
+    "typer>=0.27.0,<0.28",
 ]
 
 [project.urls]

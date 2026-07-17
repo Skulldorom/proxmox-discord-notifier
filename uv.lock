@@ -508,10 +508,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"] },
-    { name = "httpx", specifier = "==0.28.1" },
-    { name = "pydantic", specifier = "==2.13.4" },
-    { name = "pydantic-settings", specifier = "==2.14.2" },
-    { name = "typer", specifier = "==0.27.0" },
+    { name = "httpx", specifier = ">=0.28.1,<0.29" },
+    { name = "pydantic", specifier = ">=2.13.4,<2.14" },
+    { name = "pydantic-settings", specifier = ">=2.14.2,<2.15" },
+    { name = "typer", specifier = ">=0.27.0,<0.28" },
 ]
 
 [package.metadata.requires-dev]
