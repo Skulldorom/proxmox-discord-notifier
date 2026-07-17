@@ -28,6 +28,9 @@ COPY . $APP_DIR/
 
 RUN uv sync --locked
 
+RUN useradd --no-create-home --shell /bin/false appuser && \
+    chown -R appuser:appuser $APP_DIR $LOG_DIRECTORY
+
 RUN printf '#!/bin/sh\n' > /usr/local/bin/docker-entrypoint.sh \
     && printf 'if [ -n "$TZ" ]; then \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime; \
@@ -35,6 +38,8 @@ RUN printf '#!/bin/sh\n' > /usr/local/bin/docker-entrypoint.sh \
     fi\n' >> /usr/local/bin/docker-entrypoint.sh \
     && printf 'exec "$@"\n' >> /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
+
+USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:6068/health')" || exit 1
