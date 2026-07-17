@@ -1,17 +1,16 @@
 """Tests for Discord payload construction and HTTP notification."""
 
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi import HTTPException
 
 from proxmox_discord_notifier.discord import (
+    SEVERITY_CONFIG,
     build_discord_payload,
     send_discord_notification,
-    SEVERITY_CONFIG,
 )
 from proxmox_discord_notifier.schemas.notify import Notify
-
 
 # ── build_discord_payload ───────────────────────────────────────────
 

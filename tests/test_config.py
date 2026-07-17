@@ -1,13 +1,11 @@
 """Tests for Settings — URL validation, base_url quoting, log_dir auto-create."""
 
 import os
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from proxmox_discord_notifier.config import Settings
-
 
 # ── discord_webhook validation ──────────────────────────────────────
 

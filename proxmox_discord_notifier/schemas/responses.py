@@ -1,4 +1,5 @@
-from pydantic import BaseModel, AnyUrl
+from pydantic import AnyUrl, BaseModel
+
 
 class NotifyResponse(BaseModel):
     """

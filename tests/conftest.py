@@ -1,7 +1,5 @@
 """Shared fixtures for proxmox-discord-notifier tests."""
 
-import os
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest

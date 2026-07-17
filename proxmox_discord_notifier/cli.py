@@ -1,9 +1,8 @@
-import uvicorn
-import typer
-
 from pathlib import Path
 from typing import Optional
 
+import typer
+import uvicorn
 
 app = typer.Typer(help="Manage and run the proxmox-discord-notifier web server.")
 
@@ -45,7 +44,7 @@ def serve(
             ⠄⠄⠂⠄⠄⠨⣔⡝⠼⡄⠂⣦⡆⣿⣲⠐⠑⠁⠄⠃
             ⠄⠄⠄⠄⠄⠄⠃⢫⢛⣙⡊⣜⣏⡝⣝⠆
             ⠄⠄⠄⠄⠄⠄⠈⠈⠁⠁⠁⠈⠈⠊
-            
+
             Proxmox Discord Notifier - Starting...
     """
     typer.echo(skull)
