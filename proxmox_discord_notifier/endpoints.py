@@ -51,6 +51,13 @@ async def notify(
             ),
         )
 
+    # Guard against None message (schema allows it but write_text rejects it)
+    if not payload.message:
+        raise HTTPException(
+            status_code=400,
+            detail="Message field is required and cannot be empty",
+        )
+
     log_id = uuid.uuid4().hex
 
     # Use custom base URL if configured, otherwise use request URL
