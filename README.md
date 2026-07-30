@@ -218,6 +218,12 @@ The test suite covers:
 uv run ruff check .
 ```
 
+### Format
+
+```bash
+uv run ruff format .
+```
+
 ## Credits
 
 This project is maintained by [Skulldorom](https://github.com/Skulldorom). While this implementation represents a fresh approach to Proxmox-to-Discord notifications, it may build upon concepts and ideas from earlier community projects in the Proxmox ecosystem.

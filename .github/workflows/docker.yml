@@ -23,6 +23,15 @@ jobs:
       - name: Verify lockfile is up to date
         run: uv lock --check
 
+      - name: Install locked dependencies
+        run: uv sync --frozen --dev
+
+      - name: Run Ruff lint checks
+        run: uv run ruff check .
+
+      - name: Check Ruff formatting
+        run: uv run ruff format --check .
+
       - name: Set lowercase repository name
         run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
