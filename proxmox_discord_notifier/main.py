@@ -40,8 +40,8 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title='Proxmox Discord Notifier',
-        description='Proxmox Discord notifier service',
+        title="Proxmox Discord Notifier",
+        description="Proxmox Discord notifier service",
         lifespan=lifespan,
     )
 
@@ -52,4 +52,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

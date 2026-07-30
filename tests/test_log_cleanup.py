@@ -35,6 +35,7 @@ async def test_retention_disabled_zero_days(tmp_path):
         log_retention_days=0,
     )
     import proxmox_discord_notifier.log_cleanup as lc
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(lc, "settings", settings)
         deleted = await cleanup_old_logs()
@@ -55,6 +56,7 @@ async def test_cleanup_deletes_old_files(tmp_path):
         log_retention_days=30,
     )
     import proxmox_discord_notifier.log_cleanup as lc
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(lc, "settings", settings)
         deleted = await cleanup_old_logs()
@@ -72,6 +74,7 @@ async def test_cleanup_nonexistent_directory(tmp_path):
         log_retention_days=30,
     )
     import proxmox_discord_notifier.log_cleanup as lc
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(lc, "settings", settings)
         deleted = await cleanup_old_logs()
@@ -91,6 +94,7 @@ async def test_cleanup_skips_non_log_files(tmp_path):
         log_retention_days=30,
     )
     import proxmox_discord_notifier.log_cleanup as lc
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(lc, "settings", settings)
         deleted = await cleanup_old_logs()
@@ -119,6 +123,7 @@ async def test_cleanup_permission_error_handled(tmp_path):
         log_retention_days=30,
     )
     import proxmox_discord_notifier.log_cleanup as lc
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(lc, "settings", settings)
         mp.setattr(Path, "unlink", failing_unlink)

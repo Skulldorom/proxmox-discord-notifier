@@ -31,12 +31,10 @@ def test_settings(tmp_log_dir):
 @pytest.fixture
 def app_with_settings(test_settings):
     """Create a FastAPI app with controlled settings."""
-    with patch(
-        "proxmox_discord_notifier.endpoints.settings", test_settings
-    ), patch(
-        "proxmox_discord_notifier.log_cleanup.settings", test_settings
-    ), patch(
-        "proxmox_discord_notifier.config.settings", test_settings
+    with (
+        patch("proxmox_discord_notifier.endpoints.settings", test_settings),
+        patch("proxmox_discord_notifier.log_cleanup.settings", test_settings),
+        patch("proxmox_discord_notifier.config.settings", test_settings),
     ):
         app = create_app()
         yield app
@@ -56,9 +54,7 @@ def mock_httpx_post():
     mock_response = AsyncMock()
     mock_response.status_code = 204
 
-    with patch(
-        "proxmox_discord_notifier.discord.get_http_client"
-    ) as mock_get_client:
+    with patch("proxmox_discord_notifier.discord.get_http_client") as mock_get_client:
         mock_client = AsyncMock()
         mock_client.post = AsyncMock(return_value=mock_response)
         mock_get_client.return_value = mock_client
