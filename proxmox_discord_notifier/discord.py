@@ -6,11 +6,11 @@ from fastapi import HTTPException
 from pydantic import AnyUrl
 
 SEVERITY_CONFIG = {
-    "info":    {"color": 0x3498db, "emoji": "ℹ️"},
-    "notice":  {"color": 0x2ecc71, "emoji": "🔔"},
-    "warning": {"color": 0xf1c40f, "emoji": "⚠️"},
-    "error":   {"color": 0xe74c3c, "emoji": "❌"},
-    "unknown": {"color": 0x95a5a6, "emoji": "❔"},
+    "info": {"color": 0x3498DB, "emoji": "ℹ️"},
+    "notice": {"color": 0x2ECC71, "emoji": "🔔"},
+    "warning": {"color": 0xF1C40F, "emoji": "⚠️"},
+    "error": {"color": 0xE74C3C, "emoji": "❌"},
+    "unknown": {"color": 0x95A5A6, "emoji": "❔"},
 }
 
 # Shared HTTP client for connection pooling (improves performance)
@@ -30,8 +30,7 @@ def get_http_client() -> httpx.AsyncClient:
     global _http_client
     if _http_client is None:
         _http_client = httpx.AsyncClient(
-            timeout=10.0,
-            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+            timeout=10.0, limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
         )
     return _http_client
 
@@ -39,10 +38,10 @@ def get_http_client() -> httpx.AsyncClient:
 def build_discord_payload(payload, log_url: str) -> dict:
     severity = (payload.severity or "unknown").lower()
     cfg = SEVERITY_CONFIG.get(severity, SEVERITY_CONFIG["unknown"])
-    desc = payload.discord_description or ''
+    desc = payload.discord_description or ""
 
     embed = {
-        "title":  f"{cfg['emoji']} {payload.title or 'Notification'}",
+        "title": f"{cfg['emoji']} {payload.title or 'Notification'}",
         "description": desc,
         "color": cfg["color"],
         "fields": [
@@ -54,7 +53,7 @@ def build_discord_payload(payload, log_url: str) -> dict:
 
     return {
         "content": f"<@{payload.mention_user_id}>\n" if payload.mention_user_id else "",
-        "embeds": [embed]
+        "embeds": [embed],
     }
 
 
@@ -63,7 +62,7 @@ async def send_discord_notification(
     payload: dict[str, Any],
     timeout: float = 10.0,
 ) -> int:
-    """ Send a JSON payload to a Discord webhook URL. """
+    """Send a JSON payload to a Discord webhook URL."""
     client = get_http_client()
     response = await client.post(
         str(webhook_url),

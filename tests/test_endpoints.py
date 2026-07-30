@@ -59,9 +59,7 @@ async def test_notify_discord_failure(client, full_payload, tmp_log_dir):
     mock_client = AsyncMock()
     mock_client.post = AsyncMock(return_value=mock_response)
 
-    with patch(
-        "proxmox_discord_notifier.discord.get_http_client", return_value=mock_client
-    ):
+    with patch("proxmox_discord_notifier.discord.get_http_client", return_value=mock_client):
         response = await client.post("/api/notify", json=full_payload)
         assert response.status_code == 429
         assert "failed" in response.json()["detail"].lower()

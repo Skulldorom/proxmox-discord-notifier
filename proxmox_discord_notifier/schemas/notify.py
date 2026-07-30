@@ -8,11 +8,11 @@ class Notify(BaseModel):
     # Limit message size to 10MB to prevent disk space exhaustion (CWE-400)
     message: str | None = Field(None, max_length=10_485_760)
     title: str | None = Field(None, max_length=256)
-    severity: str | None = Field('info', max_length=50)
+    severity: str | None = Field("info", max_length=50)
     discord_description: str | None = Field(None, max_length=4096)
     mention_user_id: str | None = Field(None, max_length=32)
 
-    @field_validator('discord_webhook')
+    @field_validator("discord_webhook")
     @classmethod
     def validate_discord_webhook(cls, v):
         """Validate webhook URL to prevent SSRF attacks (CWE-918)"""

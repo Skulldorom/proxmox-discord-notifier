@@ -9,13 +9,9 @@ app = typer.Typer(help="Manage and run the proxmox-discord-notifier web server."
 
 @app.command()
 def serve(
-    host: str = typer.Option(
-        "127.0.0.1", "--host", "-h", help="Host/IP to bind the server on."
-    ),
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host/IP to bind the server on."),
     port: int = typer.Option(6068, "--port", "-p", help="Port to listen on."),
-    log_level: str = typer.Option(
-        "info", "--log-level", "-l", help="Uvicorn log level."
-    ),
+    log_level: str = typer.Option("info", "--log-level", "-l", help="Uvicorn log level."),
     uvicorn_config: Optional[Path] = typer.Option(
         None,
         "--config",

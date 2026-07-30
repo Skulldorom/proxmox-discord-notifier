@@ -12,21 +12,21 @@ class Settings(BaseSettings):
     base_url: str | None = None  # Custom base URL for when behind a proxy
     log_retention_days: int = 30  # Number of days to keep logs (0 = keep forever)
 
-    @field_validator("log_directory", mode='after')
+    @field_validator("log_directory", mode="after")
     def create_log_directory(cls, v):
         v.mkdir(parents=True, exist_ok=True)
         return v
 
-    @field_validator('base_url', mode='before')
+    @field_validator("base_url", mode="before")
     @classmethod
     def clean_base_url(cls, v):
         """Strip quotes from base_url if present"""
         if v is None or not isinstance(v, str):
             return v
         # Remove surrounding quotes if present
-        return v.strip('\'"')
+        return v.strip("'\"")
 
-    @field_validator('discord_webhook')
+    @field_validator("discord_webhook")
     @classmethod
     def validate_discord_webhook(cls, v):
         """Validate webhook URL to prevent SSRF attacks (CWE-918)"""
