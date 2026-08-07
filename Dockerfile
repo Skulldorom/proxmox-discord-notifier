@@ -1,4 +1,4 @@
-FROM python:3.14.6-slim-bookworm
+FROM python:3.15.0b3-slim-bookworm
 
 LABEL org.opencontainers.image.title="proxmox-discord-notifier"
 LABEL org.opencontainers.image.description="Proxmox Discord notifier service"
