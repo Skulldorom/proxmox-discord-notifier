@@ -126,9 +126,9 @@ def test_discord_description_max_length():
     assert len(notify.discord_description) == 4096
 
 
-def test_mention_user_id_max_length():
-    """mention_user_id limited to 32 chars."""
+def test_mention_user_id_requires_a_discord_snowflake():
+    """Only numeric Discord snowflakes are accepted."""
     with pytest.raises(ValidationError):
-        Notify(message="test", mention_user_id="x" * 33)
-    notify = Notify(message="test", mention_user_id="x" * 32)
-    assert len(notify.mention_user_id) == 32
+        Notify(message="test", mention_user_id="x" * 32)
+    notify = Notify(message="test", mention_user_id="123456789012345678")
+    assert notify.mention_user_id == "123456789012345678"

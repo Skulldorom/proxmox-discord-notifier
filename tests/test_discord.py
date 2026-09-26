@@ -44,9 +44,9 @@ def test_build_payload_unknown_severity_defaults():
 
 def test_build_payload_with_mention():
     """When mention_user_id is set, content includes the @mention."""
-    notify = Notify(message="test", title="Alert", mention_user_id="123456789")
+    notify = Notify(message="test", title="Alert", mention_user_id="123456789012345678")
     payload = build_discord_payload(notify, "http://example.com/logs/abc")
-    assert payload["content"] == "<@123456789>\n"
+    assert payload["content"] == "<@123456789012345678>\n"
 
 
 def test_build_payload_without_mention():
@@ -131,5 +131,5 @@ async def test_send_discord_http_error():
                 webhook_url="https://discord.com/api/webhooks/123/abc",
                 payload={"embeds": []},
             )
-        assert exc_info.value.status_code == 429
-        assert "failed" in exc_info.value.detail.lower()
+        assert exc_info.value.status_code == 502
+        assert "retry" in exc_info.value.detail.lower()

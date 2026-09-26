@@ -27,10 +27,11 @@ Whether you run nightly backups or ad‑hoc snapshots, **proxmox-discord-notifie
 - **Configurable Retention** — Auto-cleanup of old logs after _N_ days (default: 30 days; set to 0 to keep forever).
 - **Dark-Mode Log Viewer** — Built-in HTML log viewer with dark theme for browsers.
 - **Health Endpoint** — `/health` probe for orchestrator readiness/liveness checks.
-- **Security Hardened** — Non-root container, SSRF protection on webhook URLs, path traversal hardening on log IDs, message size limits.
+- **Security Hardened** — Optional bearer authentication, signed expiring log links, SSRF protection, strict mention controls, and request-size limits.
+- **Non-root Container** — The production process runs as the unprivileged `notifier` user and writes only to its configured log volume.
 - **Lightweight** — Single Python package on FastAPI; managed with `uv`.
-- **Docker‑Ready** — Multi-stage-adjacent Dockerfile with HEALTHCHECK and non-root runtime.
-- **Comprehensive Test Suite** — 130+ tests covering config, endpoints, Discord, log cleanup, and schema validation.
+- **Docker‑Ready** — Stable Python runtime with a health check and persistent log volume support.
+- **Tested** — Configuration, endpoints, Discord delivery, cleanup, and schema behavior are covered by automated tests.
 
 ## Prerequisites
 
@@ -46,6 +47,8 @@ docker run -d \
   --restart unless-stopped \
   -e TZ=UTC \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e NOTIFIER_API_TOKEN="replace-with-a-long-random-secret" \
+  -e LOG_SIGNING_SECRET="replace-with-a-different-32-character-minimum-secret" \
   -e LOG_RETENTION_DAYS=30 \
   -p 6068:6068 \
   -v p2d_logs:/var/logs/p2d \
@@ -65,6 +68,8 @@ services:
     environment:
       - TZ=UTC
       - DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+      - NOTIFIER_API_TOKEN=replace-with-a-long-random-secret
+      - LOG_SIGNING_SECRET=replace-with-a-different-32-character-minimum-secret
       - LOG_RETENTION_DAYS=30
     ports:
       - "6068:6068"
@@ -93,10 +98,21 @@ Point your Proxmox cluster at the `/notify` endpoint so every alert is mirrored 
 
 ### Configuration
 
-The Discord webhook URL can be configured in two ways:
+Configure the notifier through environment variables. Keep all secrets outside request payloads and version control.
 
-1. **Environment Variable** (Recommended): Set `DISCORD_WEBHOOK` in your Docker/environment
-2. **Request Payload**: Include `discord_webhook` in each request (overrides environment variable)
+| Setting | Default | Behavior |
+| --- | --- | --- |
+| `DISCORD_WEBHOOK` | unset | Server-side Discord webhook. Required unless the high-risk request override is enabled. HTTPS Discord-owned webhook URLs only. |
+| `NOTIFIER_API_TOKEN` | unset | When set, `POST /api/notify` requires `Authorization: Bearer <token>`. When unset, the endpoint is only appropriate on a trusted private network. |
+| `ALLOW_REQUEST_WEBHOOK` | `false` | Rejects `discord_webhook` supplied in requests by default. Set to `true` only with `NOTIFIER_API_TOKEN` configured; validated request webhooks then override `DISCORD_WEBHOOK`. |
+| `MAX_REQUEST_BYTES` | `10550000` | Maximum raw `POST /api/notify` body size in bytes. Oversize bodies return `413` before JSON parsing, log writes, or Discord delivery. Configure the same or smaller limit in a reverse proxy. |
+| `BASE_URL` | unset | Optional valid HTTP(S) external URL used for log links. Trailing slashes are removed. Without it, the incoming request URL is used. |
+| `LOG_RETENTION_DAYS` | `30` | Non-negative days to retain logs. `0` disables automatic deletion. |
+| `LOG_SIGNING_SECRET` | unset | Dedicated minimum-32-character HMAC secret for log links. Required to create or view logs; keep stable across restarts so existing links remain valid. |
+| `LOG_URL_TTL_HOURS` | `24` | Lifetime of Discord log links, from 1 hour through 365 days. |
+| `TZ` | `UTC` | Container timezone. |
+
+`LOG_SIGNING_SECRET`, `NOTIFIER_API_TOKEN`, and `DISCORD_WEBHOOK` have separate purposes and must use different secret values. New log URLs contain an expiry and HMAC signature; unsigned, altered, and expired URLs are rejected.
 
 #### Custom Base URL (Behind Proxy)
 
@@ -107,6 +123,7 @@ If your service is behind a reverse proxy or accessed via a custom domain, set t
 docker run -d \
   --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_SIGNING_SECRET="use-a-stable-random-secret-at-least-32-characters" \
   -e BASE_URL="https://your-domain.com" \
   -p 6068:6068 \
   ghcr.io/skulldorom/proxmox-discord-notifier:latest
@@ -116,6 +133,7 @@ docker run -d \
 # docker-compose
 environment:
   - DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+  - LOG_SIGNING_SECRET=use-a-stable-random-secret-at-least-32-characters
   - BASE_URL=https://your-domain.com
 ```
 
@@ -134,6 +152,7 @@ By default, logs are kept for 30 days and then automatically deleted. Configure 
 docker run -d \
   --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_SIGNING_SECRET="use-a-stable-random-secret-at-least-32-characters" \
   -e LOG_RETENTION_DAYS=7 \
   -p 6068:6068 \
   ghcr.io/skulldorom/proxmox-discord-notifier:latest
@@ -141,35 +160,25 @@ docker run -d \
 
 The cleanup task runs automatically every 24 hours starting when the application launches.
 
-### Setup with Environment Variable
+### Secure Proxmox setup
 
-If you set the `DISCORD_WEBHOOK` environment variable, you can omit it from the request body:
+Set `DISCORD_WEBHOOK`, `NOTIFIER_API_TOKEN`, and `LOG_SIGNING_SECRET` on the service. In the Proxmox notification target, configure the server URL and save the API token as a secret header value:
 
-| UI Field          | Value / Example                                                                                                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Endpoint Name** | `proxmox-discord-notifier`                                                                                                                                                           |
-| **Method**        | `POST`                                                                                                                                                                               |
-| **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                             |
-| **Headers**       | `Content-Type: application/json`                                                                                                                                                     |
-| **Body**          | <pre lang=json>{<br/> "title" : "{{ title }}",<br/> "message": "{{ escape message }}",<br/> "severity": "{{ severity }}",<br/> "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre> |
-| **Secrets**       | `user_id` → your Discord user ID (optional)                                                                                                                                          |
-| **Enable**        | ✓                                                                                                                                                                                    |
+| UI Field | Value / Example |
+| --- | --- |
+| **Endpoint Name** | `proxmox-discord-notifier` |
+| **Method** | `POST` |
+| **URL** | `http://<API_SERVER_IP>:6068/api/notify` |
+| **Headers** | `Content-Type: application/json` and `Authorization: Bearer <NOTIFIER_API_TOKEN>` |
+| **Body** | <pre lang=json>{<br/> "title": "{{ title }}",<br/> "message": "{{ escape message }}",<br/> "severity": "{{ severity }}",<br/> "mention_user_id": "{{ secrets.user_id }}"<br/>}</pre> |
+| **Secrets** | `NOTIFIER_API_TOKEN` and optional `user_id` (a 17–20 digit Discord user ID) |
+| **Enable** | ✓ |
 
-### Setup with Request Payload
+`GET /health` remains unauthenticated for Docker and orchestrator probes. Do not expose an unauthenticated notifier outside a trusted private network.
 
-If you prefer to include the webhook in each request or need per-request webhooks:
+### Request webhook override (higher risk)
 
-| UI Field          | Value / Example                                                                                                                                                                                                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Endpoint Name** | `proxmox-discord-notifier`                                                                                                                                                                                                                                                            |
-| **Method**        | `POST`                                                                                                                                                                                                                                                                                |
-| **URL**           | `http://<API_SERVER_IP>:6068/api/notify`                                                                                                                                                                                                                                              |
-| **Headers**       | `Content-Type: application/json`                                                                                                                                                                                                                                                      |
-| **Body**          | <pre lang=json>{<br/> "discord_webhook": "https://discord.com/api/webhooks/{{ secrets.id }}/{{ secrets.token }}",<br/> "title" : "{{ title }}",<br/> "message": "{{ escape message }}",<br/> "severity": "{{ severity }}",<br/> "mention_user_id":"{{ secrets.user_id }}"<br/>}</pre> |
-| **Secrets**       | `id` → your Discord webhook **ID**<br>`token` → your Discord webhook **token** <br>`user_id` → your Discord user ID (optional)                                                                                                                                                        |
-| **Enable**        | ✓                                                                                                                                                                                                                                                                                     |
-
-> **Note**: If both environment variable and request payload contain a webhook URL, the request payload takes precedence.
+Requests containing `discord_webhook` are rejected by default. If per-request routing is required, set both `ALLOW_REQUEST_WEBHOOK=true` and `NOTIFIER_API_TOKEN`; authenticated requests may then supply a validated Discord HTTPS webhook, which overrides `DISCORD_WEBHOOK`. This expands the trust boundary and should be used only for trusted callers.
 
 ### Custom Embed Description
 

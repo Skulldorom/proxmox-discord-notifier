@@ -56,7 +56,7 @@ def test_none_webhook_accepted():
 def test_base_url_strips_quotes(input_url, expected):
     """base_url has surrounding quotes stripped if present."""
     s = Settings(base_url=input_url)
-    assert s.base_url == expected
+    assert s.base_url is None if expected is None else str(s.base_url).rstrip("/") == expected
 
 
 # ── log_directory auto-create ───────────────────────────────────────

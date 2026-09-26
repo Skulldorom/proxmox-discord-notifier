@@ -22,9 +22,10 @@ def test_settings(tmp_log_dir):
     """Settings with a temporary log directory and no default webhook."""
     return Settings(
         log_directory=tmp_log_dir,
-        discord_webhook=None,
+        discord_webhook="https://discord.com/api/webhooks/123/default",
         base_url=None,
         log_retention_days=30,
+        log_signing_secret="01234567890123456789012345678901",
     )
 
 
@@ -32,7 +33,6 @@ def test_settings(tmp_log_dir):
 def app_with_settings(test_settings):
     """Create a FastAPI app with controlled settings."""
     with (
-        patch("proxmox_discord_notifier.endpoints.settings", test_settings),
         patch("proxmox_discord_notifier.log_cleanup.settings", test_settings),
         patch("proxmox_discord_notifier.config.settings", test_settings),
     ):
@@ -73,7 +73,6 @@ def valid_payload():
 def full_payload():
     """A full notify payload with all optional fields."""
     return {
-        "discord_webhook": "https://discord.com/api/webhooks/123456789/abcdef",
         "message": "Full test message",
         "title": "Test Alert",
         "severity": "warning",
