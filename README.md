@@ -123,6 +123,7 @@ If your service is behind a reverse proxy or accessed via a custom domain, set t
 docker run -d \
   --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_SIGNING_SECRET="use-a-stable-random-secret-at-least-32-characters" \
   -e BASE_URL="https://your-domain.com" \
   -p 6068:6068 \
   ghcr.io/skulldorom/proxmox-discord-notifier:latest
@@ -132,6 +133,7 @@ docker run -d \
 # docker-compose
 environment:
   - DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+  - LOG_SIGNING_SECRET=use-a-stable-random-secret-at-least-32-characters
   - BASE_URL=https://your-domain.com
 ```
 
@@ -150,6 +152,7 @@ By default, logs are kept for 30 days and then automatically deleted. Configure 
 docker run -d \
   --name proxmox-discord-notifier \
   -e DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" \
+  -e LOG_SIGNING_SECRET="use-a-stable-random-secret-at-least-32-characters" \
   -e LOG_RETENTION_DAYS=7 \
   -p 6068:6068 \
   ghcr.io/skulldorom/proxmox-discord-notifier:latest

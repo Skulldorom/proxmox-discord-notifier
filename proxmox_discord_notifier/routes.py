@@ -15,10 +15,12 @@ class LimitedBodyRoute(APIRoute):
         async def limited_handler(request: Request):
             limit = config.settings.max_request_bytes
             body = bytearray()
+            size = 0
             async for chunk in request.stream():
-                body.extend(chunk)
-                if len(body) > limit:
+                size += len(chunk)
+                if size > limit:
                     raise HTTPException(status_code=413, detail="Request body too large")
+                body.extend(chunk)
             request._body = bytes(body)
             return await original_handler(request)
 
