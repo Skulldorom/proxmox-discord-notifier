@@ -1,44 +1,39 @@
-FROM python:3.15.0rc2-slim-bookworm
+FROM python:3.13.7-slim-bookworm@sha256:adafcc17694d715c905b4c7bebd96907a1fd5cf183395f0ebc4d3428bd22d92d
 
 LABEL org.opencontainers.image.title="proxmox-discord-notifier"
 LABEL org.opencontainers.image.description="Proxmox Discord notifier service"
-LABEL org.opencontainers.image.authors="Skulldorom <51134009+Skulldorom@users.noreply.github.com>"
-LABEL org.opencontainers.image.url="https://github.com/Skulldorom/proxmox-discord-notifier"
 LABEL org.opencontainers.image.source="https://github.com/Skulldorom/proxmox-discord-notifier"
 LABEL org.opencontainers.image.licenses="MIT"
 
-ENV PYTHONUNBUFFERED=1
-ENV TZ=UTC
-ENV LOG_RETENTION_DAYS=30
-
 ARG APP_DIR=/opt/proxmox-discord-notifier
-ENV LOG_DIRECTORY=/var/logs/p2d
+ARG UID=10001
+ARG GID=10001
+ENV PYTHONUNBUFFERED=1 \
+    TZ=UTC \
+    LOG_RETENTION_DAYS=30 \
+    LOG_DIRECTORY=/var/logs/p2d \
+    UV_PROJECT_ENVIRONMENT=${APP_DIR}/.venv \
+    UV_LINK_MODE=copy
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.8.22@sha256:9874eb7afe5ca16c363fe80b294fe700e460df29a55532bbfea234a0f12eddb1 /uv /uvx /bin/
 
-RUN mkdir -p ${LOG_DIRECTORY}
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid ${GID} notifier \
+    && useradd --uid ${UID} --gid notifier --create-home --home-dir /home/notifier --shell /usr/sbin/nologin notifier \
+    && mkdir -p ${APP_DIR} ${LOG_DIRECTORY} \
+    && chown notifier:notifier ${APP_DIR} ${LOG_DIRECTORY}
 
-WORKDIR $APP_DIR
+WORKDIR ${APP_DIR}
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --locked --no-dev --no-install-project --python /usr/local/bin/python3
+COPY --chown=notifier:notifier . ./
+RUN uv sync --locked --no-dev --python /usr/local/bin/python3 && chown -R notifier:notifier ${APP_DIR}
 
-RUN apt-get update && \
-    apt-get install -y tzdata  && \
-    apt-get clean
-
-COPY . $APP_DIR/
-
-RUN uv sync --locked
-
-RUN printf '#!/bin/sh\n' > /usr/local/bin/docker-entrypoint.sh \
-    && printf 'if [ -n "$TZ" ]; then \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime; \
-    echo "$TZ" > /etc/timezone; \
-    fi\n' >> /usr/local/bin/docker-entrypoint.sh \
-    && printf 'exec "$@"\n' >> /usr/local/bin/docker-entrypoint.sh \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh
-
+VOLUME ["/var/logs/p2d"]
+USER notifier:notifier
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:6068/health')" || exit 1
-
 EXPOSE 6068
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["uv", "run", "proxmox-discord-notifier", "--host", "0.0.0.0", "--port", "6068"]
+CMD [".venv/bin/proxmox-discord-notifier", "--host", "0.0.0.0", "--port", "6068"]

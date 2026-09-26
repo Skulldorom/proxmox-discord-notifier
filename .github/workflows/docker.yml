@@ -1,4 +1,4 @@
-name: Build and Push Docker image
+name: Validate and publish Docker image
 
 on:
   push:
@@ -7,53 +7,61 @@ on:
     branches: [main]
 
 jobs:
-  build-push:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv lock --check
+      - run: uv sync --frozen --dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+
+  container-smoke:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t proxmox-discord-notifier:ci .
+      - name: Start non-root image
+        run: >-
+          docker run -d --name notifier-smoke -p 127.0.0.1:6068:6068
+          -e LOG_SIGNING_SECRET=01234567890123456789012345678901
+          proxmox-discord-notifier:ci
+      - name: Verify health, UID, and log-volume ownership
+        run: |
+          for _ in $(seq 1 20); do curl -fsS http://127.0.0.1:6068/health && break; sleep 1; done
+          test "$(docker exec notifier-smoke id -u)" != 0
+          docker exec notifier-smoke sh -c 'test -w "$LOG_DIRECTORY" && touch "$LOG_DIRECTORY"/.smoke && rm "$LOG_DIRECTORY"/.smoke'
+      - if: always()
+        run: docker rm -f notifier-smoke || true
+
+  publish:
+    needs: [validate, container-smoke]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
-        contents: read
-        packages: write
-        id-token: write
+      contents: read
+      packages: write
+      id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Verify lockfile is up to date
-        run: uv lock --check
-
-      - name: Install locked dependencies
-        run: uv sync --frozen --dev
-
-      - name: Run Ruff lint checks
-        run: uv run ruff check .
-
-      - name: Check Ruff formatting
-        run: uv run ruff format --check .
-
+      - uses: actions/checkout@v4
       - name: Set lowercase repository name
-        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Log in to GHCR
-        if: github.event_name == 'push'
-        uses: docker/login-action@v4.6.0
+        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v7
+      - uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name == 'push' }}
+          push: true
           tags: |
             ghcr.io/${{ env.REPO_LC }}:${{ github.sha }}
             ghcr.io/${{ env.REPO_LC }}:latest
-          cache-from: ${{ github.event_name == 'push' && format('type=registry,ref=ghcr.io/{0}:latest', env.REPO_LC) || '' }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.REPO_LC }}:latest
           cache-to: type=inline
-          provenance: false
