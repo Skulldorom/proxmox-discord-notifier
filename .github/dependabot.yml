@@ -14,8 +14,8 @@ updates:
       - "dependencies"
       - "github-actions"
 
-  # Python
-  - package-ecosystem: "pip"
+  # Python / uv
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
