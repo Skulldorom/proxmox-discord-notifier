@@ -2,13 +2,13 @@
 
 Reliable Proxmox Backup and VM Log Notifications in Discord
 
-![alt text](image.png)
-
+[![Dependabot Updates](https://github.com/Skulldorom/proxmox-discord-notifier/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Skulldorom/proxmox-discord-notifier/actions/workflows/dependabot/dependabot-updates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-<p align="center">
+<p align="left">
   <a href="https://ko-fi.com/skulldorom"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" /></a>
 </p>
+
+![alt text](image.png)
 
 ## Overview
 
